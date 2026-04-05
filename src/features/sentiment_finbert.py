@@ -1,35 +1,27 @@
-"""Interfaces for transcript sentiment scoring with finance-oriented transformers."""
+"""Backward-compatible exports for FinBERT sentiment helpers."""
 
 from __future__ import annotations
 
-import pandas as pd
+from src.features.finbert_sentiment import (
+    DEFAULT_FINBERT_BATCH_SIZE,
+    FINBERT_MODEL_NAME,
+    aggregate_sentiment,
+    bucket_sentiment,
+    load_finbert_pipeline,
+    score_finbert_sentiment,
+    score_sentences,
+    score_transcript_sections,
+    split_text_into_sentences,
+)
 
-
-def load_finbert_pipeline(model_name: str = "ProsusAI/finbert"):
-    """Load the sentiment model pipeline.
-
-    TODO:
-    - confirm package versions and runtime requirements
-    - decide whether sentiment should run at sentence level or transcript level
-    - cache model downloads for reproducibility
-    """
-
-    raise NotImplementedError("FinBERT loading is intentionally deferred in this scaffold.")
-
-
-def score_finbert_sentiment(
-    df: pd.DataFrame,
-    text_column: str = "full_transcript_text",
-    id_column: str = "transcriptid",
-) -> pd.DataFrame:
-    """Return transcript-level sentiment outputs.
-
-    Expected output columns will likely include:
-    - transcript identifier
-    - positive score
-    - negative score
-    - neutral score
-    - optional dominant-label field
-    """
-
-    raise NotImplementedError("Sentiment scoring is reserved for the next implementation pass.")
+__all__ = [
+    "DEFAULT_FINBERT_BATCH_SIZE",
+    "FINBERT_MODEL_NAME",
+    "aggregate_sentiment",
+    "bucket_sentiment",
+    "load_finbert_pipeline",
+    "score_finbert_sentiment",
+    "score_sentences",
+    "score_transcript_sections",
+    "split_text_into_sentences",
+]

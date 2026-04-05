@@ -1,152 +1,117 @@
-# Earnings Call Communication Style Research Repository
+# Buyback Sentiment and Clarity Research Repository
 
 ## Overview
 
-This repository supports an Analytical Finance and Machine Learning course project built around earnings conference call transcripts. The immediate goal is to build a clean shared dataset and complete the first round of exploratory analysis. The longer-run goal is to study whether transcript-based communication style contains information beyond standard sentiment.
+This repository supports an Analytical Finance and Machine Learning course project focused on a new research question:
 
-## Course Context
+> Can the sentiment and clarity of executive language in earnings calls predict abnormal stock returns following a share buyback announcement?
 
-The project starts from an existing earnings call transcript corpus and a notebook for the original data pull. The professor's near-term priority is to establish a reliable shared dataset, validate it, document it, and complete initial EDA before stronger empirical claims are attempted.
+The repo now treats `FINAL.csv` as the canonical cleaned transcript-level input and uses a true WRDS component-level export for prepared remarks / Q&A / speaker splits when available.
 
-## Project Objective
+## Current Workflow
 
-The objective is to build a modular research pipeline for transcript-based signals while keeping sentiment separate from communication style.
+The project is organized around a buyback-first workflow:
 
-Candidate communication-style dimensions include:
+1. Load the cleaned transcript panel from `FINAL.csv`.
+2. Identify buyback-related calls and extract buyback text.
+3. Load true WRDS transcript components for Q&A and speaker splits.
+4. Score sentiment with FinBERT.
+5. Compute buyback clarity on filtered Q&A pairs.
+6. Run the event study using the image-spec windows from the current project design.
+7. Build sentiment × clarity result tables.
 
-- evasiveness or deflection
-- vagueness
-- hedging or uncertainty
-- directness or specificity
-- transparency
-- accountability or attribution
+## Data Inputs
 
-The repository is designed to support multiple transcript-level signals rather than collapsing everything into a single score.
+Canonical transcript-level input:
 
-## Current Phase
+- `data/FINAL.csv`
 
-The project is still in the foundation phase. Current emphasis:
+Preferred true component-level input:
 
-- repository and workflow setup
-- transcript pull extension to the 2010+ window
-- shared dataset audit, validation, and cleaning
-- exploratory EDA, keyword exploration, and topic discovery
-- documentation of assumptions and reusable code paths
+- `data/interim/wrds_transcript_components.csv`
 
-Not yet in scope:
+Heuristic fallback component input:
 
-- final empirical results
-- advanced model selection
-- strong claims about predictability or causal interpretation
+- `data/interim/transcript_components.csv`
 
-## Three Workstreams
+Notes:
 
-### Workstream 1: Shared Dataset Foundation
+- `FINAL.csv` is treated as already cleaned.
+- older pull / cleaning workflows are still present only as WIP provenance or legacy support
+- the repo does not version raw data or large generated outputs in git
 
-- consolidate the transcript corpus
-- verify coverage and identifier quality
-- audit missingness, duplicates, and filtering decisions
-- complete initial EDA
-- explore keywords, themes, and basic topic structure
+## Notebook Order
 
-### Workstream 2: Signal Exploration
+The notebooks are now split into a main workflow and an archive track.
 
-- define transcript signal families
-- keep sentiment distinct from communication-style measures
-- prototype interpretable dictionary-based features first
-- plan later model-assisted methods
-- evaluate whether prepared remarks and Q&A should be analyzed separately
+Main workflow:
 
-### Workstream 3: Research Question and Empirical Design
+1. [00_transcript_and_revenue_data_pull.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/00_transcript_and_revenue_data_pull.ipynb)
+   WIP provenance notebook for WRDS pulls. Not required if `FINAL.csv` already exists locally.
+2. [01_data_audit_and_validation.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/01_data_audit_and_validation.ipynb)
+   Validates and documents the cleaned transcript base.
+3. [02_initial_eda.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/02_initial_eda.ipynb)
+   General EDA on the cleaned transcript panel.
+4. [03_sentiment_baseline.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/03_sentiment_baseline.ipynb)
+   Transcript-level and buyback-level sentiment baseline work.
+5. [04_clarity_signal_prototyping.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/04_clarity_signal_prototyping.ipynb)
+   Clarity-feature prototyping on buyback Q&A.
+6. [05_event_study_baseline.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/05_event_study_baseline.ipynb)
+   Event-study baseline using the current image-spec design.
+7. [06_buyback_sentiment_clarity.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/06_buyback_sentiment_clarity.ipynb)
+   Master notebook for the full buyback pipeline.
 
-- frame the likely research question around incremental information beyond sentiment
-- sketch event-study and panel or cross-sectional tests
-- identify likely controls and robustness checks
-- keep the design memo separate from any future claims document
+Archive / exploratory notebooks:
 
-## Current Known Assets
+- [90_keyword_and_theme_exploration.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/90_keyword_and_theme_exploration.ipynb)
+- [91_topic_modeling.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/91_topic_modeling.ipynb)
+- [98_panel_tests_legacy.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/98_panel_tests_legacy.ipynb)
 
-- canonical raw transcript target: `data/raw/earnings_calls_full_2010_onward_with_revenue.csv`
-- current pull notebook: `notebooks/00_transcript_and_revenue_data_pull.ipynb`
+`98_panel_tests_legacy.ipynb` is intentionally archived because panel regression is no longer part of the active workflow.
 
-The working transcript schema appears to include:
+## Key Modules
 
-- transcript and company identifiers
-- transcript text and metadata
-- date fields related to the call and reporting cycle
-- market linkage variables such as `permno`, `gvkey`, and `ibes_ticker`
-- revenue and guidance-related fields
+Data:
 
-These fields still need to be formally documented in the data dictionary and validated in Task 01.
+- `src/data/load_transcripts.py`
+- `src/data/load_transcript_components.py`
+- `src/data/wrds_transcript_components.py`
+- `src/data/buyback_events.py`
+- `src/data/qa_split.py`
+- `src/data/revenue_surprise.py`
 
-## Repository Structure
+Features:
 
-```text
-.
-|-- README.md
-|-- pyproject.toml
-|-- requirements.txt
-|-- .env.example
-|-- data/
-|   |-- raw/
-|   |-- interim/
-|   |-- processed/
-|   `-- external/
-|-- notebooks/
-|-- src/
-|   |-- config/
-|   |-- data/
-|   |-- features/
-|   |-- models/
-|   |-- finance/
-|   |-- evaluation/
-|   `-- utils/
-|-- docs/
-|-- outputs/
-|   |-- figures/
-|   |-- tables/
-|   `-- reports/
-`-- tests/
-```
+- `src/features/finbert_sentiment.py`
+- `src/features/clarity.py`
+- `src/features/embeddings.py`
 
-Practical intent:
+Finance:
 
-- `data/` holds raw inputs, intermediate working files, and cleaned outputs
-- `notebooks/` holds staged exploratory and prototype notebooks
-- `src/` holds reusable loading, validation, feature, and finance logic
-- `docs/` holds working design notes, templates, and project decisions
-- `outputs/` holds generated figures, tables, and short reports
-- `tests/` holds lightweight tests for reusable code interfaces
+- `src/finance/event_study.py`
+- `src/analysis/binning.py`
 
-## Workflow
+## Event Study Design
 
-1. Pull or refresh the raw 2010+ transcript corpus.
-2. Validate transcript identifiers, dates, coverage, duplicates, and missingness.
-3. Build a documented cleaned transcript table.
-4. Run initial EDA on counts, firms, length measures, keywords, and themes.
-5. Prototype distinct transcript signals for sentiment and communication style.
-6. Link transcript observations to finance data for baseline event-study and panel tests.
+The active event-study implementation follows the current slide/image design:
 
-## Notebooks vs `src`
+- estimation window: `[-15, -3]`
+- post-event windows: `[+1, +3]` and `[+1, +5]`
+- primary expected-return model: mean model
+- current implementation uses the wide `ret_t...` columns already present in `FINAL.csv`
 
-- notebooks for exploration, plotting, quick inspection, and staged experiments
-- `src/` modules for reusable loading, validation, feature construction, and finance interfaces
+## Q&A / Clarity Status
 
-Guideline:
+The repository now supports two component sources:
 
-- if logic will be reused, moved between notebooks, or tested, it belongs in `src/`
-- if work is exploratory, visual, or one-off, it can begin in a notebook
-- outputs from notebooks should be written to `outputs/`
-- cleaned or intermediate datasets should be written to `data/interim/` or `data/processed/`
+- true WRDS component rows from `wrds_transcript_components.csv`
+- heuristic fallback rows from `transcript_components.csv`
 
-Practical note:
-
-- the notebooks are set up to auto-detect the repository root and make `src/` importable inside Jupyter
-- if you have an older kernel session open, restart the kernel after pulling notebook changes so the updated import bootstrap is used
+For clarity work, the WRDS component file should be preferred. The clarity pipeline should still filter suspicious analyst/executive pairs before scoring.
 
 ## Setup
 
-### Create an environment
+### Environment
 
 ```bash
 python3 -m venv .venv
@@ -155,60 +120,41 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Configure local paths
+### WRDS Component Pull
 
-Copy `.env.example` to `.env` and update any paths needed for:
+If you need to build the true component-level transcript file:
 
-- transcript data
-- returns data
-- fundamentals data
-- analyst data
+```bash
+python3 scripts/pull_wrds_transcript_components.py --batch-size 200
+```
 
-### Data access
+PowerShell users should set `WRDS_USERNAME` with:
 
-This repository does not include raw data or generated output files in git.
+```powershell
+$env:WRDS_USERNAME = "your_wrds_username"
+```
 
-To use the repo, a teammate needs to do one of the following:
-
-1. Run [00_transcript_and_revenue_data_pull.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/notebooks/00_transcript_and_revenue_data_pull.ipynb) themselves, assuming they have the required WRDS access.
-2. Manually place the required data files into the expected repo folders.
-
-Expected file locations:
-
-- raw transcript file: `data/raw/earnings_calls_full_2010_onward_with_revenue.csv`
-- cleaned Task 01 file: `data/processed/CLEANED_earnings_calls_full_2010_onward_with_revenue.csv`
-
-During the transition, the loader still supports fallback to the older legacy filename if the canonical raw file is not present.
-
-### Run tests
+### Tests
 
 ```bash
 pytest
 ```
 
-## Current Known Limitations
+## Current Practical Status
 
-- raw and processed data files are not versioned in git, so new users must create or place them locally
-- the 2010+ raw pull still needs to be rerun and saved to the canonical `data/raw/` location
-- the final canonical event date has not been chosen
-- the transcript observation unit is not yet fully documented
-- prepared remarks and Q&A have not yet been formally split or validated
-- exploratory topic outputs should be treated as descriptive, not final constructs
-- no empirical results in this repository should be treated as final at this stage
+Ready now:
 
-## Immediate Next Steps
+- transcript-level buyback detection
+- WRDS-based Q&A speaker split
+- FinBERT sentiment pipeline
+- event study with the current design
+- result-table scaffolding
 
-- rerun Task 00 to build the 2010+ raw transcript file
-- rerun Task 01 to rebuild the cleaned shared dataset from 2010 onward
-- refresh Task 02 outputs on the updated cleaned corpus
-- complete the first version of the data dictionary
-- decide the first sentiment baseline and first interpretable style prototypes
-- define how event dates and return windows will be handled later in the finance design
+Use with care:
 
-## Core Documents
+- buyback clarity should use filtered Q&A pairs only
 
-- [Professor Requirements](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/docs/01_professor_requirements.md)
-- [Signal Exploration Plan](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/docs/02_signal_exploration_plan.md)
-- [Research Question Design](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/docs/03_research_question_design.md)
-- [Data Dictionary Template](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/docs/04_data_dictionary_template.md)
-- [Methodology Notes](/mnt/c/Users/javed/Documents/Projects/Analytical Finance and Machine Learning/docs/05_methodology_notes.md)
+Archived / not current:
+
+- panel-regression notebook flow
+- older exploratory notebook order

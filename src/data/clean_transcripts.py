@@ -1,4 +1,9 @@
-"""Cleaning helpers for transcript extraction issues and shared dataset construction."""
+"""WIP cleaning helpers for legacy transcript extraction workflows.
+
+The current project should use `data/FINAL.csv` as the cleaned canonical
+input file. These cleaning helpers remain exploratory and should not be
+relied upon as the production data-construction path.
+"""
 
 from __future__ import annotations
 

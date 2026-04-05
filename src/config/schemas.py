@@ -27,15 +27,12 @@ EXPECTED_TRANSCRIPT_COLUMNS = [
     "fiscal_year",
     "fiscal_quarter",
     "actual_revenue",
-    "prior_guidance_revenue",
-    "guidance_low",
-    "guidance_high",
-    "guidance_date",
-    "guidance_surprise",
-    "guidance_surprise_pct",
-    "forward_guidance_revenue",
-    "forward_guidance_period",
     "ibes_ticker",
+    "ibes_announcement_date",
+    "ibes_mean_est_eps",
+    "ibes_actual_eps",
+    "ibes_raw_surp_eps",
+    "ibes_sue_eps",
 ]
 
 REQUIRED_TRANSCRIPT_COLUMNS = [

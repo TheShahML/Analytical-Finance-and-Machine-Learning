@@ -14,6 +14,7 @@ python-dotenv>=1.0
 PyYAML>=6.0
 nbformat>=5.10
 pytest>=8.1
+wrds>=3.2
 ruff>=0.3
 black>=24.2
 
@@ -22,3 +23,5 @@ nltk>=3.8
 spacy>=3.7
 transformers>=4.39
 sentence-transformers>=2.6
+torch>=2.0.0
+textstat>=0.7.3

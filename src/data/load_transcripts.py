@@ -1,4 +1,9 @@
-"""Reusable loaders for the raw earnings-call transcript dataset."""
+"""Reusable loaders for the canonical cleaned earnings-call transcript dataset.
+
+`data/FINAL.csv` is the primary cleaned input for the current project.
+The older pull/clean scripts remain WIP and should not be relied upon
+as the canonical data-construction path.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +15,7 @@ import pandas as pd
 
 from src.config.schemas import EXPECTED_TRANSCRIPT_COLUMNS
 from src.config.settings import (
+    CANONICAL_TRANSCRIPT_PATH,
     DATA_DIR,
     LEGACY_TRANSCRIPT_PATH,
     RAW_TRANSCRIPT_PATH,
@@ -25,7 +31,27 @@ DEFAULT_DATE_COLUMNS = [
     "fiscal_period_end",
     "report_date",
     "guidance_date",
+    "ibes_anndats",
+    "ibes_announcement_date",
 ]
+
+FINAL_DATASET_COLUMN_ALIASES = {
+    "compustat_actual_revenue": "actual_revenue",
+    "ibes_anndats": "ibes_announcement_date",
+}
+
+
+def add_dataset_alias_columns(
+    df: pd.DataFrame,
+    alias_map: dict[str, str] | None = None,
+) -> pd.DataFrame:
+    """Add stable alias columns used by downstream research modules."""
+
+    aliased = df.copy()
+    for source, target in (alias_map or FINAL_DATASET_COLUMN_ALIASES).items():
+        if source in aliased.columns and target not in aliased.columns:
+            aliased[target] = aliased[source]
+    return aliased
 
 
 def resolve_transcript_path(path: str | Path | None = None) -> Path:
@@ -37,7 +63,7 @@ def resolve_transcript_path(path: str | Path | None = None) -> Path:
             raise FileNotFoundError(f"Transcript file not found: {resolved}")
         return resolved
 
-    candidates = [RAW_TRANSCRIPT_PATH, LEGACY_TRANSCRIPT_PATH]
+    candidates = [CANONICAL_TRANSCRIPT_PATH, RAW_TRANSCRIPT_PATH, LEGACY_TRANSCRIPT_PATH]
     for filename in TRANSCRIPT_FILENAME_CANDIDATES:
         candidates.extend([DATA_DIR / "raw" / filename, DATA_DIR / filename])
 
@@ -46,7 +72,7 @@ def resolve_transcript_path(path: str | Path | None = None) -> Path:
             return candidate
 
     raise FileNotFoundError(
-        "No transcript file found in the canonical raw directory or the current legacy path."
+        "No transcript file found in `data/FINAL.csv`, the canonical raw directory, or the legacy path."
     )
 
 
@@ -154,6 +180,7 @@ def load_raw_transcripts(
 
     if standardize_columns:
         df = standardize_transcript_columns(df)
+        df = add_dataset_alias_columns(df)
     if parse_dates:
         df = coerce_date_columns(df)
     return df

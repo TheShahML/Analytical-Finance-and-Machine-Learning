@@ -8,13 +8,25 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
-DEFAULT_TRANSCRIPT_FILENAME = "earnings_calls_full_2010_onward_with_revenue.csv"
+DEFAULT_TRANSCRIPT_FILENAME = "FINAL.csv"
 TRANSCRIPT_FILENAME_CANDIDATES = [
     DEFAULT_TRANSCRIPT_FILENAME,
+    "final.csv",
+    "earnings_calls_full_2010_onward_with_revenue.csv",
     "earnings_calls_full_5year_with_revenue.csv",
 ]
+CANONICAL_TRANSCRIPT_PATH = DATA_DIR / DEFAULT_TRANSCRIPT_FILENAME
 RAW_TRANSCRIPT_PATH = DATA_DIR / "raw" / DEFAULT_TRANSCRIPT_FILENAME
-LEGACY_TRANSCRIPT_PATH = DATA_DIR / DEFAULT_TRANSCRIPT_FILENAME
+LEGACY_TRANSCRIPT_PATH = DATA_DIR / "earnings_calls_full_2010_onward_with_revenue.csv"
+TRANSCRIPT_COMPONENT_FILENAME_CANDIDATES = [
+    "wrds_transcript_components.csv",
+    "true_transcript_components.csv",
+    "FINAL_COMPONENTS.csv",
+    "final_components.csv",
+    "transcript_components.csv",
+    "transcript_component_rows.csv",
+    "qa_components.csv",
+]
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,9 @@ import pandas as pd
 
 from src.data.build_panel import flag_usable_transcripts
 from src.data.clean_transcripts import apply_cleaning_pipeline, deduplicate_transcript_events
-from src.data.load_transcripts import standardize_transcript_columns
+from src.data.final_dataset import get_wide_return_columns, summarize_final_dataset_capabilities
+from src.data.load_transcripts import add_dataset_alias_columns, standardize_transcript_columns
+from src.finance.wide_returns import compute_car_from_wide_returns
 from src.data.validate_transcripts import (
     build_validation_summary,
     check_required_columns,
@@ -53,6 +55,48 @@ def test_standardize_transcript_columns_normalizes_names() -> None:
     df = pd.DataFrame(columns=["Transcript ID", "Call-Date", "Full Transcript Text"])
     standardized = standardize_transcript_columns(df)
     assert list(standardized.columns) == ["transcript_id", "call_date", "full_transcript_text"]
+
+
+def test_add_dataset_alias_columns_creates_stable_final_csv_aliases() -> None:
+    df = pd.DataFrame(
+        {
+            "compustat_actual_revenue": [100.0],
+            "ibes_anndats": ["2024-01-31"],
+        }
+    )
+
+    aliased = add_dataset_alias_columns(df)
+
+    assert aliased.loc[0, "actual_revenue"] == 100.0
+    assert aliased.loc[0, "ibes_announcement_date"] == "2024-01-31"
+
+
+def test_summarize_final_dataset_capabilities_flags_missing_qa_fields() -> None:
+    df = pd.DataFrame(
+        {
+            "full_transcript_text": ["buyback"],
+            "actual_revenue": [100.0],
+            "ret_t-1": [0.01],
+            "ret_t1": [0.02],
+        }
+    )
+
+    capabilities = summarize_final_dataset_capabilities(df)
+    qa_row = capabilities.loc[
+        capabilities["workflow_step"] == "Prepared remarks vs Q&A split"
+    ].iloc[0]
+    assert bool(qa_row["supported"]) is False
+
+
+def test_get_wide_return_columns_sorts_relative_days_correctly() -> None:
+    df = pd.DataFrame(columns=["ret_t1", "ret_t-2", "ret_t0", "other"])
+    assert get_wide_return_columns(df) == ["ret_t-2", "ret_t0", "ret_t1"]
+
+
+def test_compute_car_from_wide_returns_sums_requested_window() -> None:
+    df = pd.DataFrame({"ret_t1": [0.01], "ret_t2": [0.02], "ret_t3": [-0.01]})
+    car = compute_car_from_wide_returns(df, start_day=1, end_day=3)
+    assert round(car.iloc[0], 6) == 0.02
 
 
 def test_summarize_identifier_match_rate_handles_missing_columns() -> None:
