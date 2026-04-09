@@ -1,0 +1,13 @@
+Real embedding model run was skipped in fast mode.
+Presentation logic: a direct answer should have higher cosine similarity to the question than an evasive answer.
+
+Pair 1:
+  Q: Can you give us more detail on the buyback authorization and how you plan to fund it?
+  Direct answer: Sure. We authorized a $2 billion repurchase program through the end of fiscal 2025, funded entirely from free cash flow. We expect to execute approximately $500 million per quarter.
+  Evasive answer: Great question. We're really excited about returning capital to shareholders. Our board has authorized a program and we'll be opportunistic in our approach going forward.
+
+Pair 2:
+  Q: What is driving the increase in your share repurchase activity this quarter?
+  Direct answer: Two factors. First, our stock is trading at 11x forward earnings, which is a 30% discount to our 5-year average. Second, we generated $800 million in free cash flow this quarter, well above our capital needs.
+  Evasive answer: We believe our shares represent good value and we're committed to a balanced capital allocation strategy that includes returning value to shareholders.
+
