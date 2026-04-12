@@ -42,32 +42,23 @@ Notes:
 
 ## Notebook Order
 
-The notebooks are now split into a main workflow and an archive track.
+Main workflow (flat `notebooks/`; run order matches numeric prefixes):
 
-Main workflow:
+1. [notebooks/00_transcript_and_revenue_data_pull.ipynb](notebooks/00_transcript_and_revenue_data_pull.ipynb) — WIP provenance for WRDS/raw pulls. Skip if `FINAL.csv` already exists locally.
+2. [notebooks/01_data_audit_and_validation.ipynb](notebooks/01_data_audit_and_validation.ipynb) — Audit and validate the transcript base; writes processed/interim artifacts.
+3. [notebooks/02_initial_eda.ipynb](notebooks/02_initial_eda.ipynb) — General EDA (keywords, topics) on the audited panel.
+4. [notebooks/03_buyback_sentiment_clarity.ipynb](notebooks/03_buyback_sentiment_clarity.ipynb) — **Master pipeline:** buyback detection, FinBERT sentiment, Q&A clarity, revenue surprise, event study, sentiment × clarity tables (`FINAL.csv` path).
+5. [notebooks/04_buyback_announcement_classification_ollama.ipynb](notebooks/04_buyback_announcement_classification_ollama.ipynb) — LLM classification of buyback excerpts (Ollama); run **before** the EDA notebooks that summarize those labels.
+6. [notebooks/05_sentiment_clarity_eda_outputs.ipynb](notebooks/05_sentiment_clarity_eda_outputs.ipynb) — Faster sentiment × clarity EDA and presentation outputs (e.g. under `outputs/eda/`).
+7. [notebooks/06_classification_eda_outputs.ipynb](notebooks/06_classification_eda_outputs.ipynb) — Scaffold for EDA on classification outputs from notebook04.
 
-1. [00_transcript_and_revenue_data_pull.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/00_transcript_and_revenue_data_pull.ipynb)
-   WIP provenance notebook for WRDS pulls. Not required if `FINAL.csv` already exists locally.
-2. [01_data_audit_and_validation.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/01_data_audit_and_validation.ipynb)
-   Validates and documents the cleaned transcript base.
-3. [02_initial_eda.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/02_initial_eda.ipynb)
-   General EDA on the cleaned transcript panel.
-4. [03_sentiment_baseline.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/03_sentiment_baseline.ipynb)
-   Transcript-level and buyback-level sentiment baseline work.
-5. [04_clarity_signal_prototyping.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/04_clarity_signal_prototyping.ipynb)
-   Clarity-feature prototyping on buyback Q&A.
-6. [05_event_study_baseline.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/05_event_study_baseline.ipynb)
-   Event-study baseline using the current image-spec design.
-7. [06_buyback_sentiment_clarity.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/06_buyback_sentiment_clarity.ipynb)
-   Master notebook for the full buyback pipeline.
+Archive / exploratory:
 
-Archive / exploratory notebooks:
+- [notebooks/90_keyword_and_theme_exploration.ipynb](notebooks/90_keyword_and_theme_exploration.ipynb)
+- [notebooks/91_topic_modeling.ipynb](notebooks/91_topic_modeling.ipynb)
+- [notebooks/98_panel_tests_legacy.ipynb](notebooks/98_panel_tests_legacy.ipynb) — legacy panel design; `src/finance/panel_regression.py` was removed (recover from git if needed).
 
-- [90_keyword_and_theme_exploration.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/90_keyword_and_theme_exploration.ipynb)
-- [91_topic_modeling.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/91_topic_modeling.ipynb)
-- [98_panel_tests_legacy.ipynb](/mnt/c/Users/javed/Documents/Projects/Analytical%20Finance%20and%20Machine%20Learning/notebooks/98_panel_tests_legacy.ipynb)
-
-`98_panel_tests_legacy.ipynb` is intentionally archived because panel regression is no longer part of the active workflow.
+See [notebooks/README.md](notebooks/README.md) for the same list.
 
 ## Key Modules
 
@@ -84,7 +75,6 @@ Features:
 
 - `src/features/finbert_sentiment.py`
 - `src/features/clarity.py`
-- `src/features/embeddings.py`
 
 Finance:
 
@@ -127,6 +117,8 @@ If you need to build the true component-level transcript file:
 ```bash
 python3 scripts/pull_wrds_transcript_components.py --batch-size 200
 ```
+
+Other helper scripts in `scripts/`: `build_heuristic_transcript_components.py` (heuristic Q&A rows), `compare_buyback_samples.py` (keyword vs event samples), `run_buyback_sample.py` (CLI smoke run of the buyback pipeline).
 
 PowerShell users should set `WRDS_USERNAME` with:
 

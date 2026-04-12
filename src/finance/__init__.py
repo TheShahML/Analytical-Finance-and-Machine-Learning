@@ -1,1 +1,1 @@
-"""Finance-specific loading, event-study, and panel-regression interfaces."""
+"""Finance-specific loading and event-study interfaces."""
